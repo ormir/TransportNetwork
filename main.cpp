@@ -7,9 +7,19 @@
 //
 
 #include <iostream>
+#include "network.hpp"
 
 int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout << "Hello, World!\n";
+    
+    Network* net = nullptr;
+    
+    if (argc == 2) {
+        net = new Network(argv[1]);
+        net->info();
+    } else {
+        std::cout << "filename missing" << std::endl;
+    }
+    
+    if (net != nullptr) delete net;
     return 0;
 }
