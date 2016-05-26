@@ -13,6 +13,7 @@ name(n) {}
 
 std::string Station::getName() const { return name; }
 std::string Station::getLine() const { return line; }
+std::map<Station*, int> Station::getNeighbours() const { return neighbours; }
 
 void Station::addNeighbour(Station* nStation, int distance) {
     neighbours[nStation] = distance;

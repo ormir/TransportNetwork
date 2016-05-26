@@ -27,6 +27,7 @@ public:
     int getDistance(Station*) const;
     std::string getLine() const;
     std::string getName() const;
+    std::map<Station*, int> getNeighbours() const;
     void info();
 };
 

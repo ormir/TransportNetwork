@@ -12,8 +12,53 @@ Network::Network(std::string filename) {
     import(filename);
 }
 
-void Network::path(std::string bName, std::string eName) {
-    // TODO find shortest path
+bool Network::path(std::string bName, std::string eName) {
+    // find begin and end station
+    Station *source, *destination;
+    try {
+        source = stations.at(bName);
+        destination = stations.at(eName);
+    } catch (std::out_of_range e) {
+        std::cout << "Couldn't find begin or end station" << std::endl;
+        return false;
+    }
+    
+    Station * head = source;
+    auto cmp = [&](Station* left, Station* right) { return left->getDistance(head) < right->getDistance(head); };
+    std::priority_queue<Station*, std::vector<Station*>, decltype(cmp)> queue(cmp);
+    queue.push(head);
+    
+    std::set<Station*> visited;
+    std::map<Station*, int> dist;
+    std::vector<Station*> prev;
+    dist[source] = 0;
+    
+    while (!queue.empty()) {
+        head = queue.top();
+        if (head == destination) break;
+        queue.pop();
+        if (visited.find(head) != visited.end()) continue;
+        visited.insert(head);
+        
+        // Iterate Neighbours
+        std::map<Station*, int> nb = head->getNeighbours();
+        for (auto it = nb.begin(); it != nb.end(); ++it) {
+            // Check if distance already is saved
+            auto di = dist.find(it->first);
+            
+            // Distance update
+            int newDis = dist[head] + head->getDistance(it->first);
+            
+            if (di == dist.end() || newDis < dist[it->first]) {
+                dist[it->first] = newDis;
+                prev.push_back(it->first);
+                queue.push(it->first);
+            }
+        }
+    }
+    
+    
+    return false;
 }
 
 void Network::import(std::string filename) {
@@ -88,3 +133,11 @@ Network::~Network() {
         delete it->second;
     }
 }
+
+
+//class StationPriority {
+//    bool operator()(const Station& lst, const Station& rst) const
+//    {
+//        return lst. < rhs.age;
+//    }
+//};

@@ -11,6 +11,9 @@
 
 #include <stdio.h>
 #include <map>
+#include <queue>
+#include <vector>
+#include <set>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -23,7 +26,7 @@ public:
     Network(std::string);
     void import(std::string);
     Station* addStation(std::string, std::string);
-    void path(std::string, std::string);
+    bool path(std::string, std::string);
     void info() const;
     ~Network();
 };
