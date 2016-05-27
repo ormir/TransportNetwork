@@ -24,9 +24,21 @@ bool Network::path(std::string bName, std::string eName) {
     }
     
     Station * head = source;
-    auto cmp = [&](Station* left, Station* right) { return left->getDistance(head) < right->getDistance(head); };
-    std::priority_queue<Station*, std::vector<Station*>, decltype(cmp)> queue(cmp);
-    queue.push(head);
+//    auto cmp = [&](Station* left, Station* right) {
+//        int ld = left->getDistance(head);
+//        int rd = right->getDistance(head);
+//        std::cout << "Source: " << head->getName() << std::endl;
+//        std::cout << left->getName() << " (" << ld << ") < " << right->getName() << " (" << rd << ")" << std::endl;
+//        return ld < rd;
+////        return left->getDistance(head) > right->getDistance(head);
+//    };
+    
+    auto cmp = [](std::pair<int, Station*> left, std::pair<int, Station*> right) {
+        return left.first > right.first;
+    };
+    
+    std::priority_queue<std::pair<int, Station*>, std::vector<std::pair<int, Station*>>, decltype(cmp)> queue(cmp);
+    queue.push(std::make_pair(0, source));
     
     std::set<Station*> visited;
     std::map<Station*, int> dist;
@@ -34,30 +46,30 @@ bool Network::path(std::string bName, std::string eName) {
     dist[source] = 0;
     
     while (!queue.empty()) {
-        head = queue.top();
+        head = queue.top().second;
         if (head == destination) break;
         queue.pop();
         if (visited.find(head) != visited.end()) continue;
         visited.insert(head);
         
         // Iterate Neighbours
-        std::map<Station*, int> nb = head->getNeighbours();
-        for (auto it = nb.begin(); it != nb.end(); ++it) {
+        std::map<Station*, int> nbList = head->getNeighbours();
+        for (auto nb = nbList.begin(); nb != nbList.end(); ++nb) {
             // Check if distance already is saved
-            auto di = dist.find(it->first);
+            auto dis = dist.find(nb->first);
             
             // Distance update
-            int newDis = dist[head] + head->getDistance(it->first);
+            int newDis = dist[head] + head->getDistance(nb->first);
             
-            if (di == dist.end() || newDis < dist[it->first]) {
-                dist[it->first] = newDis;
-                prev.push_back(it->first);
-                queue.push(it->first);
+            if (dis == dist.end() || newDis < dist[nb->first]) {
+                dist[nb->first] = newDis;
+                prev.push_back(nb->first);
+                queue.push(std::make_pair(head->getDistance(nb->first), nb->first));
             }
         }
     }
     
-    
+    // Show shortest path
     return false;
 }
 

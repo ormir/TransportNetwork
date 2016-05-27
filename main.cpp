@@ -15,6 +15,7 @@ int main(int argc, const char * argv[]) {
     
     if (argc == 2) {
         net = new Network(argv[1]);
+//        net->info();
         net->path("Burggasse-Stadthalle", "Messe-Prater");
     } else {
         std::cout << "filename missing" << std::endl;
