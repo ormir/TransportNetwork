@@ -24,14 +24,6 @@ bool Network::path(std::string bName, std::string eName) {
     }
     
     Station * head = source;
-//    auto cmp = [&](Station* left, Station* right) {
-//        int ld = left->getDistance(head);
-//        int rd = right->getDistance(head);
-//        std::cout << "Source: " << head->getName() << std::endl;
-//        std::cout << left->getName() << " (" << ld << ") < " << right->getName() << " (" << rd << ")" << std::endl;
-//        return ld < rd;
-////        return left->getDistance(head) > right->getDistance(head);
-//    };
     
     auto cmp = [](std::pair<int, Station*> left, std::pair<int, Station*> right) {
         return left.first > right.first;
@@ -42,7 +34,6 @@ bool Network::path(std::string bName, std::string eName) {
     
     std::set<Station*> visited;
     std::map<Station*, int> dist;
-    std::vector<Station*> prev;
     dist[source] = 0;
     
     while (!queue.empty()) {
@@ -63,13 +54,34 @@ bool Network::path(std::string bName, std::string eName) {
             
             if (dis == dist.end() || newDis < dist[nb->first]) {
                 dist[nb->first] = newDis;
-                prev.push_back(nb->first);
                 queue.push(std::make_pair(head->getDistance(nb->first), nb->first));
             }
         }
     }
     
-    // Show shortest path
+    
+    
+    // Show shortest path (reverse iteration)
+    std::cout << "It takes " << dist[head] << " min from " << source->getName() << " to " << destination->getName() << std::endl;
+    std::string wayyy = head->getName();
+    while (head != source) {
+        Station * nbShort = nullptr;
+        
+        // Get neighbour with shortest path to source
+        std::map<Station*, int> nbList = head->getNeighbours();
+        for (auto nb = nbList.begin(); nb != nbList.end(); ++nb) {
+            if (nbShort == nullptr) nbShort = nb->first;
+            else if (dist[nbShort] > dist[nb->first]) {
+                nbShort = nb->first;
+            }
+        }
+        
+        wayyy = nbShort->getName()+ " -> " + wayyy;
+        head = nbShort;
+    }
+    
+    std::cout << wayyy << std::endl;
+    
     return false;
 }
 
@@ -145,11 +157,3 @@ Network::~Network() {
         delete it->second;
     }
 }
-
-
-//class StationPriority {
-//    bool operator()(const Station& lst, const Station& rst) const
-//    {
-//        return lst. < rhs.age;
-//    }
-//};
