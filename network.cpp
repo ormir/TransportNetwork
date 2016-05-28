@@ -71,7 +71,8 @@ bool Network::path(std::string bName, std::string eName) {
         std::map<Station*, int> nbList = head->getNeighbours();
         for (auto nb = nbList.begin(); nb != nbList.end(); ++nb) {
             if (nbShort == nullptr) nbShort = nb->first;
-            else if (dist[nbShort] > dist[nb->first]) {
+            else if (visited.find(nb->first) != visited.end() &&
+                     dist[nbShort] > dist[nb->first]) {
                 nbShort = nb->first;
             }
         }
