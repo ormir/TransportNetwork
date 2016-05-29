@@ -23,11 +23,13 @@ class Network {
     std::map<std::string, Station*> stations;
     
 public:
+    Network();
     Network(std::string);
     void import(std::string);
     Station* addStation(std::string, std::string);
     bool path(std::string, std::string);
     void info() const;
+    void help() const;
     ~Network();
 };
 

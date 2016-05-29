@@ -8,6 +8,8 @@
 
 #include "network.hpp"
 
+Network::Network() {}
+
 Network::Network(std::string filename) {
     import(filename);
 }
@@ -16,37 +18,50 @@ bool Network::path(std::string bName, std::string eName) {
     // find begin and end station
     Station *source, *destination;
     try {
+        //make sure that the given starting point and destination are part of the network
         source = stations.at(bName);
         destination = stations.at(eName);
+        //if the stations were not found, output this:
     } catch (std::out_of_range e) {
         std::cout << "Couldn't find begin or end station" << std::endl;
         return false;
     }
     
+    //creating a pointer that points at the source which is the starting point
     Station * head = source;
     
+    //the class pair is pairing together these two different values: int and a pointer
+    //we only need the int value which we access with "first"
+    //auto cmp compares the distances of the stations left and right
     auto cmp = [](std::pair<int, Station*> left, std::pair<int, Station*> right) {
         return left.first > right.first;
     };
     
+    //here we create a queue that stores all the visited stations between 'source' and 'destination' (given from the user)
     std::priority_queue<std::pair<int, Station*>, std::vector<std::pair<int, Station*>>, decltype(cmp)> queue(cmp);
     queue.push(std::make_pair(0, source));
     
+    //creating a set for all the visited nodes aka stations
+    //creating a map for the distances
     std::set<Station*> visited;
     std::map<Station*, int> dist;
     dist[source] = 0;
     
     while (!queue.empty()) {
+        //head is always the current node that we're on. here it becomes the first station of the queue
         head = queue.top().second;
         if (head == destination) break;
+        //remove the first node in the queue
         queue.pop();
+        //go over the while loop again and again until it reaches the last node in the set called visited
         if (visited.find(head) != visited.end()) continue;
+        //insert head into the set
         visited.insert(head);
         
         // Iterate Neighbours
         std::map<Station*, int> nbList = head->getNeighbours();
         for (auto nb = nbList.begin(); nb != nbList.end(); ++nb) {
-            // Check if distance already is saved
+            // Check if distance is already saved
             auto dis = dist.find(nb->first);
             
             // Distance update
@@ -70,11 +85,9 @@ bool Network::path(std::string bName, std::string eName) {
         // Get neighbour with shortest path to source
         std::map<Station*, int> nbList = head->getNeighbours();
         for (auto nb = nbList.begin(); nb != nbList.end(); ++nb) {
-            if (nbShort == nullptr) nbShort = nb->first;
-            else if (visited.find(nb->first) != visited.end() &&
-                     dist[nbShort] > dist[nb->first]) {
-                nbShort = nb->first;
-            }
+            if (dist.find(nb->first) == dist.end()) continue;
+            else if (nbShort == nullptr) nbShort = nb->first;
+            else if (dist[nbShort] > dist[nb->first]) nbShort = nb->first;
         }
         
         wayyy = nbShort->getName()+ " -> " + wayyy;
@@ -125,6 +138,7 @@ void Network::import(std::string filename) {
                 stat = nStat;
             }
         }
+        std::cout << stations.size() << " stations have been imported successfully" << std::endl;
     } else {
         std::cout << "Couldn't open '" << filename << "'" << std::endl;
     }
@@ -148,9 +162,28 @@ Station* Network::addStation(std::string name, std::string lineName) {
 }
 
 void Network::info() const {
-    for (auto it = stations.begin(); it != stations.end(); ++it) {
-        it->second->info();
+    if(stations.empty()){
+        std::cout << "No station exists" << std::endl;
+    }else{
+        for (auto it = stations.begin(); it != stations.end(); ++it) {
+            it->second->info();
+        }
     }
+}
+
+void Network::help() const{
+    //open README.txt
+    std::ifstream file("README.txt");
+    if(file.is_open()){
+        while(!file.eof()){
+            std::string line;
+            std::getline(file,line);
+            std::cout << line << std::endl;
+        }
+    }else {
+        std::cout << "No help found, too bad bruh" << std::endl;
+    }
+    file.close();
 }
 
 Network::~Network() {
