@@ -14,17 +14,20 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <set>
 
 class Station {
     std::string name;
     std::string line;
     std::map<Station*, int> neighbours;
+    std::set<std::string> lines;
     
 public:
     Station(std::string);
     void addNeighbour(Station*, int);
     void addLine(const std::string);
     int getDistance(Station*) const;
+    int fiveMin(std::string);
     std::string getLine() const;
     std::string getName() const;
     std::map<Station*, int> getNeighbours() const;

@@ -15,6 +15,7 @@ std::string Station::getName() const { return name; }
 std::string Station::getLine() const { return line; }
 std::map<Station*, int> Station::getNeighbours() const { return neighbours; }
 
+
 //adds neighbour to the map that contains all references to the neighbours
 void Station::addNeighbour(Station* nStation, int distance) {
     neighbours[nStation] = distance;
@@ -33,12 +34,23 @@ int Station::getDistance(Station* nStation) const {
 
 //function to add the metro lines to the stations such as U1, U2, etc in case there are more than just one line
 void Station::addLine(const std::string nLine) {
-    if(line.empty()) line = nLine;
-    else {
+    if(line.empty()) {
+        line = nLine;
+        lines.insert(nLine);
+    } else {
         line.append(", ");
         line.append(nLine);
+        lines.insert(nLine);
     }
 }
+
+//int Station::fiveMin(std::string name){
+//    int dis = 0;
+//    for(auto it = lines.begin(); it != lines.end(); ++it){
+//        dis += 5;
+//    }
+//    return dis;
+//}
 
 //function to display all the stations of the transportation network
 void Station::info() {

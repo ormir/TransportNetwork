@@ -61,12 +61,12 @@ bool Network::path(std::string bName, std::string eName) {
         // Iterate Neighbours
         std::map<Station*, int> nbList = head->getNeighbours();
         for (auto nb = nbList.begin(); nb != nbList.end(); ++nb) {
+            
             // Check if distance is already saved
             auto dis = dist.find(nb->first);
             
             // Distance update
             int newDis = dist[head] + head->getDistance(nb->first);
-            
             if (dis == dist.end() || newDis < dist[nb->first]) {
                 dist[nb->first] = newDis;
                 queue.push(std::make_pair(head->getDistance(nb->first), nb->first));
@@ -74,11 +74,11 @@ bool Network::path(std::string bName, std::string eName) {
         }
     }
     
-    
-    
+
     // Show shortest path (reverse iteration)
     std::cout << "It takes " << dist[head] << " min from " << source->getName() << " to " << destination->getName() << std::endl;
     std::string wayyy = head->getName();
+    int distance = 0;
     while (head != source) {
         Station * nbShort = nullptr;
         
@@ -90,11 +90,16 @@ bool Network::path(std::string bName, std::string eName) {
             else if (dist[nbShort] > dist[nb->first]) nbShort = nb->first;
         }
         
+        if(std::prev(nbShort)->getLine() != std::next(nbShort)->getLine()){
+            dist[nbShort] = dist[nbShort] + 5;
+        }
+        
         wayyy = nbShort->getName()+ " -> " + wayyy;
         head = nbShort;
+        distance = dist[nbShort];
     }
     
-    std::cout << wayyy << std::endl;
+    std::cout << wayyy << distance << std::endl;
     
     return false;
 }
