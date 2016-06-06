@@ -32,12 +32,13 @@ bool Network::path(std::string bName, std::string eName) {
     
     //the class pair is pairing together these two different values: int and a pointer
     //we only need the int value which we access with "first"
-    //auto cmp compares the distances of the stations left and right
+    //auto cmp is part of priority queue below
     auto cmp = [](std::pair<int, Station*> left, std::pair<int, Station*> right) {
         return left.first > right.first;
     };
     
     //here we create a queue that stores all the visited stations between 'source' and 'destination' (given from the user)
+    //all the elements in the priority queue are ordered by cmp condition -> left.first > right.first
     std::priority_queue<std::pair<int, Station*>, std::vector<std::pair<int, Station*>>, decltype(cmp)> queue(cmp);
     queue.push(std::make_pair(0, source));
     
@@ -55,10 +56,11 @@ bool Network::path(std::string bName, std::string eName) {
         queue.pop();
         //go over the while loop again and again until it reaches the last node in the set called visited
         if (visited.find(head) != visited.end()) continue;
-        //insert head into the set
+        //insert head into the set if it is not part of the visited stations yet
         visited.insert(head);
         
         // Iterate Neighbours
+        //gets all neighbours from map neighbours of Station(head)
         std::map<Station*, int> nbList = head->getNeighbours();
         for (auto nb = nbList.begin(); nb != nbList.end(); ++nb) {
             // Check if distance is already saved
@@ -67,6 +69,9 @@ bool Network::path(std::string bName, std::string eName) {
             // Distance update
             int newDis = dist[head] + head->getDistance(nb->first);
             
+            //if the new distance is shorter than the older distance, new distance is added to dist
+            //new dis = distance from source to current + to neighbour
+            //dist[nb->first] = distance from source to neighbour
             if (dis == dist.end() || newDis < dist[nb->first]) {
                 dist[nb->first] = newDis;
                 queue.push(std::make_pair(head->getDistance(nb->first), nb->first));
